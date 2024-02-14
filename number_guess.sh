@@ -27,7 +27,6 @@ else
     echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
 fi
 
-
 SECRET_NUMBER=$(( RANDOM % 1000 + 1 ))
 TRIES=0
 
@@ -40,12 +39,8 @@ while :; do
     fi
 
     ((TRIES++))
-if [ $GUESS == $SECRET_NUMBER ]; then
-# Update user stats - assuming USER_ID is retrieved correctly above
-$PSQL "UPDATE users SET games_played = games_played + 1, best_game = CASE WHEN best_game IS NULL OR $TRIES < best_game THEN $TRIES ELSE best_game END WHERE username = '$USERNAME';"
-echo "You guessed it in $TRIES tries. The secret number was $SECRET_NUMBER. Nice job!"
-break
-    elif [ $GUESS -eq $SECRET_NUMBER ]; then
+
+    if [ $GUESS -eq $SECRET_NUMBER ]; then
         break
     elif [ $GUESS -gt $SECRET_NUMBER ]; then
         echo "It's lower than that, guess again:"
@@ -53,3 +48,7 @@ break
         echo "It's higher than that, guess again:"
     fi
 done
+# Update user stats - assuming USER_ID is retrieved correctly above
+$PSQL "UPDATE users SET games_played = games_played + 1, best_game = CASE WHEN best_game IS NULL OR $TRIES < best_game THEN $TRIES ELSE best_game END WHERE username = '$USERNAME';"
+
+echo "You guessed it in $TRIES tries. The secret number was $SECRET_NUMBER. Nice job!"
